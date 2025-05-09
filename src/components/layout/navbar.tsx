@@ -115,7 +115,10 @@ export function Navbar() {
                     <div>
                       <button
                         onClick={async () => {
-                          await authClient.signOut();
+                          await fetch("/api/signout", {
+                            method: "POST",
+                            credentials: "include",
+                          });
                           window.location.href = "/";
                         }}
                         className="w-full text-left px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100"
