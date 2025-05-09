@@ -1,0 +1,24 @@
+// src/app/api/likes/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { db }                      from "@/lib/db";
+import { schema }                  from "@/lib/db";
+import { auth }                    from "@/lib/auth";
+
+export async function POST(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: req.headers });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const me = session.user.id;
+  const { likedId } = await req.json();
+  if (!likedId || likedId === me) {
+    return NextResponse.json({ error: "Bad request" }, { status: 400 });
+  }
+
+  await db
+    .insert(schema.likes)
+    .values({ likerId: me, likedId })
+    .onConflictDoNothing();
+
+  return NextResponse.json({ success: true });
+}
