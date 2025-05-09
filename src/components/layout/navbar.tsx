@@ -23,7 +23,7 @@ function Logo() {
 
 type Profile = { role: string; age?: number };
 
-// Define SessionUser type that includes role
+
 interface SessionUser {
   id: string;
   name: string;
@@ -32,7 +32,7 @@ interface SessionUser {
   createdAt: Date;
   updatedAt: Date;
   image?: string | null;
-  role?: string; // Make role optional
+  role?: string; 
 }
 
 export function Navbar() {
@@ -51,7 +51,6 @@ export function Navbar() {
     }
   }, [session]);
 
-  // Close dropdown when clicking *outside* of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -89,7 +88,6 @@ export function Navbar() {
               <Link href="/browse" className={navCls("/browse")}>Browse</Link>
               <Link href="/contacts" className={navCls("/contacts")}>Matches</Link>
 
-              {/* only show "Admin" if your profile.role === "admin" */}
               {profile?.role === "admin" && (
                 <Link href="/admin" className={navCls("/admin")}>
                   <span className="px-2 py-0.5 bg-[#FF0000] text-white text-xs rounded-full font-semibold">
@@ -109,7 +107,6 @@ export function Navbar() {
                   <div className="absolute right-0 mt-2 min-w-[280px] w-max bg-white shadow-lg rounded-md border border-gray-100 p-2 space-y-1 text-sm z-50">
                     <div className="px-3 py-1 text-gray-700">{user?.name}{profile?.age && <> · {profile.age}</>}</div>
                     <div className="px-3 py-1 text-gray-500">{user?.email}</div>
-                    {/* Only show role for admin users */}
                     {profile?.role === "admin" && (
                       <div className="px-3 py-1 text-gray-500">
                         Role: <span className="capitalize">{profile.role}</span>

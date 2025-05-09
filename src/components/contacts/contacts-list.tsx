@@ -48,7 +48,7 @@ export function ContactsList() {
         const contactsResponse = await fetch("/api/contacts");
         const contactsJson     = await contactsResponse.json();
         setContacts(Array.isArray(contactsJson) ? contactsJson : []);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Error fetching contacts:", error);
       } finally {
         setIsLoading(false);
