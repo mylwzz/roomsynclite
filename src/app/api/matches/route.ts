@@ -1,9 +1,8 @@
 // src/app/api/matches/route.ts
 import { NextResponse }               from "next/server";
 import { headers }                    from "next/headers";
-import { db }                         from "@/lib/db";
-import { schema }                     from "@/lib/db";
-import { auth }                       from "@/lib/auth";
+import { db, schema }                 from "@/lib/db.server";
+import { auth }                       from "@/lib/auth.server";
 import { eq, ne, and, isNull, sql }   from "drizzle-orm";
 import { calculateCompatibilityScore } from "@/lib/utils";
 
@@ -52,7 +51,7 @@ export async function GET() {
 
   const out = rows.map(({ profile, userId }) => ({
     // spread in all profile fields,
-    // but critically _use_ userId as the record’s id for liking/passing
+    // but critically _use_ userId as the record's id for liking/passing
     id:                 userId,
     name:               profile.name,
     age:                profile.age,

@@ -19,10 +19,10 @@ interface MatchCardProps {
   user: User;
   onLike: (userId: string) => void;
   onPass: (userId: string) => void;
-  showLocation: boolean;
+  showLocation?: boolean;
 }
 
-export function MatchCard({ user, onLike, onPass, showLocation }: MatchCardProps) {
+export function MatchCard({ user, onLike, onPass, showLocation = false }: MatchCardProps) {
   const [expanded, setExpanded] = useState(false);
   
   return (

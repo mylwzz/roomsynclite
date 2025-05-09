@@ -8,49 +8,42 @@ import { authClient } from "@/lib/auth-client";
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail]     = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName]       = useState("");
+  const [error, setError]     = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(""); // Clear any previous errors
+    setError("");
 
     try {
+      let result;
       if (isLogin) {
-        // For sign in
-        const result = await authClient.signIn.email({
-          email,
-          password
-        });
-        
-        if (result.error) {
-          setError(result.error.message ?? "Sign in failed");
-        } else {
-          console.log("Sign in successful, redirecting...");
-          router.push("/onboarding");
-        }
+        result = await authClient.signIn.email({ email, password });
       } else {
-        // For sign up
-        const result = await authClient.signUp.email({
-          email,
-          password,
-          name
+        result = await authClient.signUp.email({ email, password, name });
+      }
+
+      if (result.error) {
+        setError(result.error.message || "Auth failed");
+      } else {
+        // after successful auth, see if they already have a profile
+        const profileRes = await fetch("/api/profile", {
+          credentials: "include",
         });
-        
-        if (result.error) {
-          setError(result.error.message ?? "Sign up failed");
+        const profileData = await profileRes.json().catch(() => null);
+
+        if (profileRes.ok && profileData) {
+          router.push("/browse");
         } else {
-          console.log("Sign up successful, redirecting...");
           router.push("/onboarding");
         }
       }
     } catch (err: any) {
-      console.error("Auth error:", err);
-      setError(err?.message ?? "An error occurred");
+      setError(err.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +63,9 @@ export function AuthForm() {
         )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Show name field only for signup */}
           {!isLogin && (
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              <label htmlFor="name" className="block text-sm font-medium mb-1">
                 Name
               </label>
               <input
@@ -82,14 +74,14 @@ export function AuthForm() {
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required={!isLogin}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+                className="w-full border rounded px-3 py-2"
               />
             </div>
           )}
           
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email
             </label>
             <input
@@ -99,12 +91,12 @@ export function AuthForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full border rounded px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
               Password
             </label>
             <input
@@ -113,19 +105,19 @@ export function AuthForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full border rounded px-3 py-2"
             />
           </div>
           
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
             disabled={isLoading}
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white py-2 rounded"
           >
             {isLoading
               ? isLogin
-                ? "Signing in..."
-                : "Creating account..."
+                ? "Signing in…"
+                : "Creating account…"
               : isLogin
               ? "Sign in"
               : "Sign up"}
@@ -134,10 +126,12 @@ export function AuthForm() {
           <div className="text-center mt-4">
             <button
               type="button"
-              className="text-sm text-blue-600 hover:underline"
               onClick={() => setIsLogin(!isLogin)}
+              className="text-sm text-blue-600 hover:underline"
             >
-              {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
+              {isLogin
+                ? "Need an account? Sign up"
+                : "Already have an account? Sign in"}
             </button>
           </div>
         </form>

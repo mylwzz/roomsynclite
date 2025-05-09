@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth";
-import { db }   from "@/lib/db";
+import { auth } from "@/lib/auth.server";
+import { db }   from "@/lib/db.server";
 import { eq }   from "drizzle-orm";
 
 export async function requireAdmin(req: Request) {

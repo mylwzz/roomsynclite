@@ -1,12 +1,12 @@
 // src/app/onboarding/page.tsx
-import { getSessionWithProfile } from "@/lib/auth";
+import { getSessionWithProfile } from "@/lib/auth.server";
 import { redirect }              from "next/navigation";
 import { ProfileForm }           from "@/components/profile/profile-form";
 
 export default async function OnboardingPage() {
   const { session, profile } = await getSessionWithProfile();
 
-  // if you already have a profile, go browse
+  // if we already have both session _and_ profile, skip onboarding
   if (session?.user && profile) {
     redirect("/browse");
   }

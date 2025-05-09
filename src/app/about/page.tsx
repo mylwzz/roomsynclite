@@ -15,7 +15,7 @@ export default function AboutPage() {
         <div> 
           <h2 className="text-2xl font-semibold mb-4">How it works:</h2>
           <ol className="list-decimal pl-5 space-y-2"> 
-            <li><strong>Create a profile</strong> – tell us about your habits and preferences.</li>
+            <li><strong>Create a profile</strong> – tell others about your habits and preferences.</li>
             <li><strong>Browse matches</strong> – our compatibility score highlights the best fits.</li>
             <li><strong>Connect</strong> – like someone to swap contact info when the feeling is mutual.</li>
           </ol>
@@ -38,11 +38,11 @@ export default function AboutPage() {
             the info icon in the <em>Browse</em> table.
           </p>
         </div>
-        
+
       </article>
 
       <footer className="text-center text-sm text-gray-500 mt-12"> 
-        © 2025 RoomSync Lite - Built for CS 5356 @ Cornell Tech
+        © 2025 RoomSync Lite - Made with ❤️
       </footer>
     </section>
   );

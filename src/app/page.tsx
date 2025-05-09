@@ -1,13 +1,12 @@
 // src/app/page.tsx  (Server Component)
 import { redirect } from "next/navigation";
-import { getSessionWithProfile } from "@/lib/auth";
+import { getSessionWithProfile } from "@/lib/auth.server";
 import { AuthForm } from "@/components/auth/auth-form";
 
 export default async function LandingPage() {
   const { session, profile } = await getSessionWithProfile();
 
   if (session?.user) {
-    // Logged-in user → choose where to go
     if (!profile) {
       redirect("/onboarding");
     } else {
@@ -15,7 +14,6 @@ export default async function LandingPage() {
     }
   }
 
-  // Visitor not logged-in → show sign-up / login form
   return (
     <div className="grid min-h-screen p-8 sm:p-20 place-items-center gap-12">
       <main className="flex flex-col items-center gap-8">

@@ -31,7 +31,7 @@ export function ProfileForm() {
     try {
       const res = await fetch("/api/profile", {
         method: "POST",
-        credentials: "include",   //  ← IMPORTANT
+        credentials: "include",  
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -60,7 +60,6 @@ export function ProfileForm() {
       )}
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -88,7 +87,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Gender and Looking For */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -124,7 +122,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Role and Location */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -158,7 +155,6 @@ export function ProfileForm() {
           )}
         </div>
 
-        {/* Compatibility Factors */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -202,7 +198,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Sleep Schedule */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -228,7 +223,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Bio */}
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Bio

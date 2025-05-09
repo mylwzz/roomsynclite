@@ -1,10 +1,11 @@
 // src/lib/auth-client.ts
 import { createAuthClient } from "better-auth/react";
 
-export const authClient = createAuthClient();
+export const authClient = createAuthClient({
+  fetchOptions: { credentials: "include" },
+});
 
-// You can also export these methods directly
-export const { 
-  useSession, 
-  getSession 
+export const {
+  useSession,
+  getSession,
 } = authClient;

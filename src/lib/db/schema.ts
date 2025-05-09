@@ -9,20 +9,20 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-/*── Common enums ───────────────────────────────────────────*/
+
 export const roleEnum   = pgEnum("role",   ["looking", "offering", "browsing", "admin"]);
 export const genderEnum = pgEnum("gender", ["male", "female", "prefer_not_to_say"]);
 
-/*── Better-Auth tables (NanoID primary keys) ───────────────*/
+
 export const users = pgTable("users", {
-  id:            text("id").primaryKey(),      // NanoID
+  id:            text("id").primaryKey(),    
   name:          text("name").notNull(),
   email:         text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image:         text("image"),
   createdAt:     timestamp("created_at").defaultNow(),
   updatedAt:     timestamp("updated_at").defaultNow(),
-  role: roleEnum("role").notNull().default("browsing"),
+  role:          roleEnum("role").notNull().default("browsing"),
 });
 
 export const sessions = pgTable("sessions", {
@@ -65,7 +65,7 @@ export const verifications = pgTable("verifications", {
   updatedAt:  timestamp("updated_at").defaultNow(),
 });
 
-/*── App-specific tables ───────────────────────────────────*/
+
 export const profiles = pgTable("profiles", {
   id:               serial("id").primaryKey(),
   userId:           text("user_id")
@@ -105,8 +105,8 @@ export const likes = pgTable("likes", {
 export const passes = pgTable("passes", {
   id:        serial("id").primaryKey(),
   passerId:  text("passer_id").notNull()
-                         .references(() => users.id, { onDelete: "cascade" }),
+             .references(() => users.id, { onDelete:"cascade" }),
   passedId:  text("passed_id").notNull()
-                         .references(() => users.id, { onDelete: "cascade" }),
+             .references(() => users.id, { onDelete:"cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -129,11 +129,12 @@ export function MatchList() {
   
   const handlePass = async (id: string) => {
     await fetch("/api/passes", {
-      method:"POST", credentials:"include",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ passedId:id }),
-    }).catch(console.error);
-    setUsers((p)=>p.filter(u=>u.id!==id));
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passedId: id }),
+    });
+    setUsers((u) => u.filter((x) => x.id !== id));
   };
 
   // filter + sort
@@ -159,6 +160,13 @@ export function MatchList() {
 
   if (isLoading) return <div className="text-center p-8">Loading matches…</div>;
 
+  const roleOptions = currentUser?.role === "browsing"
+    ? [
+        { value: "", label: "All Roles" },
+        { value: "offering", label: "Offering" },
+        { value: "browsing", label: "Browsing" },
+      ]
+    : [];
 
   return (
     <div className="w-full">
@@ -186,15 +194,18 @@ export function MatchList() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Role</label>
-            <select name="role" value={filters.role} onChange={handleFilterChange} className="w-full p-2 border rounded">
-              <option value="">All Roles</option>
-              <option value="looking">Looking</option>
-              <option value="offering">Offering</option>
-              <option value="browsing">Browsing</option>
-            </select>
-          </div>
+          {currentUser?.role === "browsing" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Role</label>
+              <select name="role" value={filters.role} onChange={handleFilterChange} className="w-full p-2 border rounded">
+                {roleOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium mb-1">Gender</label>
             <select name="gender" value={filters.gender} onChange={handleFilterChange} className="w-full p-2 border rounded">
@@ -248,33 +259,33 @@ export function MatchList() {
                         <InfoIcon />
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-xs text-sm leading-tight">
-                      Compatibility = 40 % Clean + 30 % Noise + 20 % Sleep + 10 % Age
+                    <TooltipContent>
+                      <p>Compatibility score based on your preferences</p>
                     </TooltipContent>
                   </Tooltip>
                 </Th>
-                {currentUser?.role === "looking" && <Th>Location</Th>}
                 <Th>Actions</Th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filtered.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
-                  <Td>{u.name}</Td>
-                  <Td>{u.age}</Td>
-                  <Td>{shortGender(u.gender)}</Td>
-                  <Td><RolePill role={u.role} /></Td>
-                  <Td>{u.cleanlinessLevel}</Td>
-                  <Td>{u.noiseTolerance}</Td>
-                  <Td>{u.sleepTime}</Td>
-                  <Td>{u.compatibilityScore?.toFixed(1)}</Td>
-                  {currentUser?.role === "looking" && (
-                    <Td>{u.role === "offering" ? u.location : "-"}</Td>
-                  )}
+              {filtered.map((user) => (
+                <tr key={user.id}>
+                  <Td>{user.name}</Td>
+                  <Td>{user.age}</Td>
+                  <Td>{shortGender(user.gender)}</Td>
+                  <Td><RolePill role={user.role} /></Td>
+                  <Td>{user.cleanlinessLevel}/5</Td>
+                  <Td>{user.noiseTolerance}/5</Td>
+                  <Td>{user.sleepTime}</Td>
+                  <Td>{user.compatibilityScore?.toFixed(1) || "–"}</Td>
                   <Td>
                     <div className="flex space-x-2">
-                      <ActionBtn onClick={() => handleLike(u.id)} color="green">Like</ActionBtn>
-                      <ActionBtn onClick={() => handlePass(u.id)} color="red">Pass</ActionBtn>
+                      <ActionBtn onClick={() => handleLike(user.id)} color="green">
+                        Like
+                      </ActionBtn>
+                      <ActionBtn onClick={() => handlePass(user.id)} color="red">
+                        Pass
+                      </ActionBtn>
                     </div>
                   </Td>
                 </tr>
@@ -285,13 +296,12 @@ export function MatchList() {
       ) : (
         /* card view */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((u) => (
+          {filtered.map((user) => (
             <MatchCard
-              key={u.id}
-              user={u}
-              onLike={handleLike}
-              onPass={handlePass}
-              showLocation={currentUser?.role === "looking"}
+              key={user.id}
+              user={user}
+              onLike={() => handleLike(user.id)}
+              onPass={() => handlePass(user.id)}
             />
           ))}
         </div>
