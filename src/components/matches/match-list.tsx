@@ -1,15 +1,15 @@
 // src/components/matches/match-list.tsx
 "use client";
 
-import { useState, useEffect }   from "react";
-import { useRouter }             from "next/navigation";
-import { motion }                from "framer-motion";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { MatchCard }             from "./match-card";
+import { MatchCard } from "./match-card";
 
 const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -74,14 +74,20 @@ interface User {
   bio?: string;
 }
 
+const getColorForLevel = (level: number) => {
+  if (level <= 1) return "bg-red-500";
+  if (level <= 3) return "bg-yellow-500";
+  return "bg-green-500";
+};
+
 export function MatchList() {
   const router = useRouter();
 
-  const [users,        setUsers]        = useState<User[]>([]);
-  const [currentUser,  setCurrentUser]  = useState<User | null>(null);
-  const [isLoading,    setIsLoading]    = useState(true);
-  const [viewMode,     setViewMode]     = useState<"table" | "card">("table");
-  const [filters,      setFilters]      = useState({
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
+  const [filters, setFilters] = useState({
     role: "",
     gender: "",
     ageMin: "",
@@ -101,7 +107,7 @@ export function MatchList() {
         }
         setCurrentUser(await p.json());
 
-        const m  = await fetch("/api/matches");
+        const m = await fetch("/api/matches");
         const arr = await m.json();
         setUsers(Array.isArray(arr) ? arr : []);
       } catch (err) {
@@ -126,7 +132,7 @@ export function MatchList() {
     });
     setUsers((u) => u.filter((x) => x.id !== id));
   };
-  
+
   const handlePass = async (id: string) => {
     await fetch("/api/passes", {
       method: "POST",
@@ -158,7 +164,11 @@ export function MatchList() {
         : a.name.localeCompare(b.name)
     );
 
-  if (isLoading) return <div className="text-center p-8">Loading matches…</div>;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    </div>
+  );
 
   const roleOptions = currentUser?.role === "browsing"
     ? [
@@ -169,35 +179,45 @@ export function MatchList() {
     : [];
 
   return (
-    <div className="w-full">
-      <div className="mb-6 p-4 bg-white rounded shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Filters</h2>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setViewMode("table")}
-              className={`px-3 py-1 rounded ${viewMode === "table"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800"}`}
-            >
-              Table View
-            </button>
-            <button
-              onClick={() => setViewMode("card")}
-              className={`px-3 py-1 rounded ${viewMode === "card"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800"}`}
-            >
-              Card View
-            </button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-primary">Your Matches</h2>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setViewMode("table")}
+            className={`px-3 py-1 rounded ${
+              viewMode === "table"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Table
+          </button>
+          <button
+            onClick={() => setViewMode("card")}
+            className={`px-3 py-1 rounded ${
+              viewMode === "card"
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Card
+          </button>
         </div>
+      </div>
 
+      <div className="bg-white rounded-lg shadow-card p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {currentUser?.role === "browsing" && (
             <div>
-              <label className="block text-sm font-medium mb-1">Role</label>
-              <select name="role" value={filters.role} onChange={handleFilterChange} className="w-full p-2 border rounded">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <select 
+                name="role" 
+                value={filters.role} 
+                onChange={handleFilterChange} 
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              >
                 {roleOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -207,24 +227,48 @@ export function MatchList() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-1">Gender</label>
-            <select name="gender" value={filters.gender} onChange={handleFilterChange} className="w-full p-2 border rounded">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+            <select 
+              name="gender" 
+              value={filters.gender} 
+              onChange={handleFilterChange} 
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            >
               <option value="">All Genders</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="prefer_not_to_say">Prefer&nbsp;not&nbsp;to&nbsp;say</option>
+              <option value="prefer_not_to_say">Prefer not to say</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Age Range</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
             <div className="flex space-x-2">
-              <input type="number" name="ageMin" placeholder="Min" value={filters.ageMin} onChange={handleFilterChange} className="w-full p-2 border rounded" />
-              <input type="number" name="ageMax" placeholder="Max" value={filters.ageMax} onChange={handleFilterChange} className="w-full p-2 border rounded" />
+              <input 
+                type="number" 
+                name="ageMin" 
+                placeholder="Min" 
+                value={filters.ageMin} 
+                onChange={handleFilterChange} 
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" 
+              />
+              <input 
+                type="number" 
+                name="ageMax" 
+                placeholder="Max" 
+                value={filters.ageMax} 
+                onChange={handleFilterChange} 
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" 
+              />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Sort By</label>
-            <select name="sortBy" value={filters.sortBy} onChange={handleFilterChange} className="w-full p-2 border rounded">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <select 
+              name="sortBy" 
+              value={filters.sortBy} 
+              onChange={handleFilterChange} 
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            >
               <option value="compatibilityScore">Compatibility</option>
               <option value="name">Name</option>
             </select>
@@ -234,13 +278,13 @@ export function MatchList() {
 
       {/* list */}
       {filtered.length === 0 ? (
-        <div className="text-center p-8 bg-white rounded shadow">
+        <div className="text-center p-8 bg-white rounded-lg shadow-card">
           <p className="text-lg">No matches fit your filters.</p>
           <p className="text-gray-500">Try broadening the criteria or check back later.</p>
         </div>
       ) : viewMode === "table" ? (
         /* table view */
-        <div className="overflow-x-auto bg-white rounded shadow">
+        <div className="overflow-x-auto bg-white rounded-lg shadow-card">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -269,13 +313,31 @@ export function MatchList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filtered.map((user) => (
-                <tr key={user.id}>
+                <tr key={user.id} className="hover:bg-gray-50">
                   <Td>{user.name}</Td>
                   <Td>{user.age}</Td>
                   <Td>{shortGender(user.gender)}</Td>
                   <Td><RolePill role={user.role} /></Td>
-                  <Td>{user.cleanlinessLevel}/5</Td>
-                  <Td>{user.noiseTolerance}/5</Td>
+                  <Td>
+                    <div className="flex space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-4 rounded ${i < user.cleanlinessLevel ? getColorForLevel(user.cleanlinessLevel) : "bg-gray-200"}`}
+                        />
+                      ))}
+                    </div>
+                  </Td>
+                  <Td>
+                    <div className="flex space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-4 rounded ${i < user.noiseTolerance ? getColorForLevel(user.noiseTolerance) : "bg-gray-200"}`}
+                        />
+                      ))}
+                    </div>
+                  </Td>
                   <Td>{user.sleepTime}</Td>
                   <Td>{user.compatibilityScore?.toFixed(1) || "–"}</Td>
                   <Td>
@@ -295,13 +357,14 @@ export function MatchList() {
         </div>
       ) : (
         /* card view */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((user) => (
             <MatchCard
               key={user.id}
               user={user}
               onLike={() => handleLike(user.id)}
               onPass={() => handlePass(user.id)}
+              showLocation={currentUser?.role === "looking"}
             />
           ))}
         </div>

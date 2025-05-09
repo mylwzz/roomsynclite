@@ -42,7 +42,8 @@ export function ProfileForm() {
         const { error } = await res.json();
         setError(error ?? "Something went wrong");
       }
-    } catch (err) {
+    } catch (error: unknown) {
+      console.error("Profile submission error:", error);
       setError("Network error");
     } finally {
       setIsLoading(false);

@@ -4,11 +4,13 @@ import { db, schema } from "@/lib/db.server";
 import { auth } from "@/lib/auth.server";
 import { eq } from "drizzle-orm";
 
+type Params = { params: { userId: string } }
+
 export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  { params }: Params
 ) {
-  const session = await auth.api.getSession({ headers: req.headers });
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -22,7 +24,7 @@ export async function PATCH(
   }
 
   const { userId } = params;
-  const body = await req.json();
+  const body = await request.json();
 
   try {
     await db
@@ -43,15 +45,14 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  { params }: Params
 ) {
-  const session = await auth.api.getSession({ headers: req.headers });
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // fetch real role
   const me = await db.query.users.findFirst({
     where: (u) => eq(u.id, session.user.id),
   });

@@ -10,7 +10,6 @@ import { eq } from "drizzle-orm";
 import { db } from "./db.server";
 import {
   users, sessions, accounts, verifications,
-  profiles, likes, passes
 } from "./db/schema";
 
 // ─── ENUMS ───────────────────────────────────────────────────────────

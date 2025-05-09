@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { getSessionWithProfile } from "@/lib/auth.server";
 import { AuthForm } from "@/components/auth/auth-form";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 export default async function LandingPage() {
   const { session, profile } = await getSessionWithProfile();
@@ -15,16 +16,30 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="grid min-h-screen p-8 sm:p-20 place-items-center gap-12">
-      <main className="flex flex-col items-center gap-8">
-        <h1 className="text-4xl font-bold">RoomSync Lite</h1>
-        <p className="text-xl text-center">Find your perfect roommate match</p>
-        <AuthForm />
-      </main>
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center mb-12">
+          <AnimatedLogo />
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="text-primary">Room</span>
+            <span className="text-gray-700">Sync</span>
+          </h1>
+          <h2 className="text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto">
+            Find your perfect roommate match based on lifestyle, habits, and preferences
+          </h2>
+        </div>
 
-      <footer className="text-sm text-gray-500">
-        © 2025 RoomSync Lite
-      </footer>
+        <div className="bg-white rounded-2xl shadow-card p-8 md:p-12 w-full max-w-md border border-gray-200 relative overflow-hidden">
+          <div className="relative">
+            <AuthForm />
+          </div>
+        </div>
+
+        <div className="mt-12 text-gray-500 text-sm text-center">
+          <p>© {new Date().getFullYear()} RoomSync. All rights reserved.</p>
+          <p>A project for CS 5356 - Building Startup Systems</p>
+        </div>
+      </div>
     </div>
   );
 }

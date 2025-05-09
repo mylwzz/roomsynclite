@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { authClient, useSession } from "@/lib/auth-client";
-import { useState, useEffect }    from "react";
+import { useState, useEffect, useRef } from "react";
 
 function Logo() {
   return (
@@ -23,12 +23,25 @@ function Logo() {
 
 type Profile = { role: string; age?: number };
 
+// Define SessionUser type that includes role
+interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  image?: string | null;
+  role?: string; // Make role optional
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // pull in your profile so we know your role
   useEffect(() => {
     if (session?.user) {
       fetch("/api/profile")
@@ -38,6 +51,23 @@ export function Navbar() {
     }
   }, [session]);
 
+  // Close dropdown when clicking *outside* of it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownOpen &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   if (isPending) return <div className="h-16 bg-white shadow" />;
 
   const navCls = (href: string) =>
@@ -45,10 +75,7 @@ export function Navbar() {
       pathname === href ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"
     }`;
 
-  const handleSignOut = async () => {
-    await authClient.signOut();
-    window.location.href = "/";
-  };
+  const user = session?.user as SessionUser | undefined;
 
   return (
     <nav className="bg-white shadow">
@@ -62,32 +89,46 @@ export function Navbar() {
               <Link href="/browse" className={navCls("/browse")}>Browse</Link>
               <Link href="/contacts" className={navCls("/contacts")}>Matches</Link>
 
-              {/* only show “Admin” if your profile.role === "admin" */}
+              {/* only show "Admin" if your profile.role === "admin" */}
               {profile?.role === "admin" && (
                 <Link href="/admin" className={navCls("/admin")}>
-                  <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded-full font-semibold">
+                  <span className="px-2 py-0.5 bg-[#FF0000] text-white text-xs rounded-full font-semibold">
                     ADMIN
                   </span>
                 </Link>
               )}
 
-              <details className="relative">
-                <summary className="cursor-pointer px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center">
-                  {session.user.name}
-                </summary>
-                <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-100 p-2 space-y-1 text-sm z-50">
-                  <li className="px-3 py-1 text-gray-700">{session.user.name}{profile?.age && <> · {profile.age}</>}</li>
-                  <li className="px-3 py-1 text-gray-500 break-all">{session.user.email}</li>
-                  <li>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100"
-                    >
-                      Sign&nbsp;Out
-                    </button>
-                  </li>
-                </ul>
-              </details>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="cursor-pointer px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center"
+                >
+                  {user?.name}
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 min-w-[280px] w-max bg-white shadow-lg rounded-md border border-gray-100 p-2 space-y-1 text-sm z-50">
+                    <div className="px-3 py-1 text-gray-700">{user?.name}{profile?.age && <> · {profile.age}</>}</div>
+                    <div className="px-3 py-1 text-gray-500">{user?.email}</div>
+                    {/* Only show role for admin users */}
+                    {profile?.role === "admin" && (
+                      <div className="px-3 py-1 text-gray-500">
+                        Role: <span className="capitalize">{profile.role}</span>
+                      </div>
+                    )}
+                    <div>
+                      <button
+                        onClick={async () => {
+                          await authClient.signOut();
+                          window.location.href = "/";
+                        }}
+                        className="w-full text-left px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100"
+                      >
+                        Sign&nbsp;Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <Link href="/" className={navCls("/")}>Sign&nbsp;In</Link>

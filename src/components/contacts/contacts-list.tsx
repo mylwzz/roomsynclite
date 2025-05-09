@@ -18,9 +18,20 @@ interface Contact {
   compatibilityScore?: number;
 }
 
+interface UserProfile {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  age?: number;
+  gender?: string;
+  location?: string;
+}
+
 export function ContactsList() {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,12 +39,12 @@ export function ContactsList() {
       try {
         setIsLoading(true);
         
-        // Fetch current user profile
+
         const profileResponse = await fetch("/api/profile");
         const profileData = await profileResponse.json();
         setCurrentUser(profileData);
         
-        // Fetch mutual matches
+
         const contactsResponse = await fetch("/api/contacts");
         const contactsJson     = await contactsResponse.json();
         setContacts(Array.isArray(contactsJson) ? contactsJson : []);

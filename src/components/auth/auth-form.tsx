@@ -30,7 +30,7 @@ export function AuthForm() {
       if (result.error) {
         setError(result.error.message || "Auth failed");
       } else {
-        // after successful auth, see if they already have a profile
+
         const profileRes = await fetch("/api/profile", {
           credentials: "include",
         });
@@ -42,8 +42,8 @@ export function AuthForm() {
           router.push("/onboarding");
         }
       }
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
