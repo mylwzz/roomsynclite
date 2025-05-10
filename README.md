@@ -4,7 +4,7 @@ A lightweight, peer‑to‑peer roommate‑matching web app built with Next.js.
 
 ---
 
-## 🚀 Live Demo
+## Live Demo  🚀(wooosh)
 
 https://roomsync-lite.vercel.app/
 
