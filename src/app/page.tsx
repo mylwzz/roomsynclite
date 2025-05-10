@@ -2,7 +2,6 @@
 import { redirect } from "next/navigation";
 import { getSessionWithProfile } from "@/lib/auth.server";
 import { AuthForm } from "@/components/auth/auth-form";
-import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 export default async function LandingPage() {
   const { session, profile } = await getSessionWithProfile();
@@ -19,7 +18,7 @@ export default async function LandingPage() {
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-screen">
         <div className="text-center mb-12">
-          <AnimatedLogo />
+          <div className="text-[124px] mb-6">🏡</div>
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
             <span className="text-primary">Room</span>
             <span className="text-gray-700">Sync</span>
