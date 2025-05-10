@@ -108,7 +108,7 @@ Deploy to Vercel in a few clicks:
 roomsync-lite/
 ├── app/
 │   ├── api/             # Server API routes
-│   │   ├── auth/        # Better Auth handlers
+│   │   ├── auth/        # Better-Auth handlers
 │   │   ├── profile/route.ts  # GET/POST profile
 │   │   ├── matches/route.ts  # GET mutual matches
 │   │   ├── likes/         # POST like
@@ -117,25 +117,28 @@ roomsync-lite/
 │   ├── onboarding/      # Onboarding UI
 │   ├── browse/          # Browse & match UI
 │   ├── contacts/        # Contacts (mutual matches)
+│   ├── page.tsx/        # Landing page
 │   └── layout.tsx       # Global layout & Navbar
 ├── components/          # UI components
 │   ├── auth/
 │   ├── matches/
+│   ├── layout/
 │   ├── contacts/
 │   └── ui/
 ├── lib/
-│   ├── auth-client.ts   # Better‑Auth React client
+│   ├── auth-client.ts   # Better-Auth React client
 │   ├── auth.server.ts   # Server‑only auth helpers
 │   ├── db.server.ts     # Drizzle client init
 │   ├── db/schema.ts     # Drizzle schema definitions
+│   ├── db/admin.ts      # Admin auth with db
 │   ├── utils.ts         # Helpers (compatibility score, cn)
 │   └── ...
 ├── drizzle/            # Drizzle‑Kit migrations
-├── public/            # Static assets
-├── tailwind.config.js   # Tailwind config
-├── next.config.js       # Next.js config
-├── vercel.json          # Vercel settings
-└── README.md          # This file
+├── public/             # Static assets
+├── tailwind.config.js  # Tailwind config
+├── next.config.js      # Next.js config
+├── vercel.json         # Vercel settings
+└── README.md           # This file
 ```
 
 ## License
