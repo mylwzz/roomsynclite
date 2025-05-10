@@ -47,7 +47,7 @@ export function AnimatedLogo() {
           />
           
           <svg
-            className="w-24 h-24 text-primary relative z-10"
+            className="w-36 h-36 text-primary relative z-10"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"

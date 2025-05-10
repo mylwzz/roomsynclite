@@ -12,11 +12,11 @@ function Logo() {
     <motion.div
       animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
       transition={{ duration: 6, repeat: Infinity, ease: "linear", repeatType: "reverse" }}
-      className="rounded-md px-3 py-1 font-bold text-white shadow-inner
+      className="rounded-md px-3 py-1.5 font-bold text-white shadow-inner text-2xl
                  bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-600"
     >
       <span className="text-black">RoomSync&nbsp;</span>
-      <span className="text-cyan-300">Lite</span>
+      <span className="text-cyan-300 text-lg">Lite</span>
     </motion.div>
   );
 }
