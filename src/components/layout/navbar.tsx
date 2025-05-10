@@ -13,7 +13,7 @@ function Logo() {
       animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
       transition={{ duration: 6, repeat: Infinity, ease: "linear", repeatType: "reverse" }}
       className="rounded-md px-3 py-1 font-bold text-white shadow-inner
-                 bg-[length:200%_200%] bg-gradient-to-r from-indigo-600 via-sky-500 to-cyan-400"
+                 bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-600"
     >
       <span className="text-black">RoomSync&nbsp;</span>
       <span className="text-cyan-300">Lite</span>

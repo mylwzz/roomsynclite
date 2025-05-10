@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
   TooltipTrigger,
@@ -84,6 +84,11 @@ export function MatchList() {
   const router = useRouter();
 
   const [users, setUsers] = useState<User[]>([]);
+  const [flash, setFlash] = useState<{
+    id: string;
+    type: "like" | "pass";
+    name: string;
+  } | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
@@ -124,23 +129,35 @@ export function MatchList() {
   };
 
   const handleLike = async (id: string) => {
+    const u = users.find((u) => u.id === id);
+    if (!u) return;
+    setFlash({ id, type: "like", name: u.name });
     await fetch("/api/likes", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ likedId: id }),     
     });
-    setUsers((u) => u.filter((x) => x.id !== id));
+    setTimeout(() => {
+      setUsers((u) => u.filter((x) => x.id !== id));
+      setFlash(null);
+    }, 2000);
   };
 
   const handlePass = async (id: string) => {
+    const u = users.find((u) => u.id === id);
+    if (!u) return;
+    setFlash({ id, type: "pass", name: u.name });
     await fetch("/api/passes", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ passedId: id }),
     });
-    setUsers((u) => u.filter((x) => x.id !== id));
+    setTimeout(() => {
+      setUsers((u) => u.filter((x) => x.id !== id));
+      setFlash(null);
+    }, 2000);
   };
 
   // filter + sort
@@ -181,7 +198,7 @@ export function MatchList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-primary">Your Matches</h2>
+        <h2 className="text-2xl font-bold text-primary">Your Matches 🏡</h2>
         <div className="flex space-x-2">
           <button
             onClick={() => setViewMode("table")}
@@ -304,7 +321,7 @@ export function MatchList() {
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Compatibility score based on your preferences</p>
+                      <p>Compatibility score based on your preferences, calculated using dot product of feature vectors.</p>
                     </TooltipContent>
                   </Tooltip>
                 </Th>
@@ -312,62 +329,117 @@ export function MatchList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filtered.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <Td>{user.name}</Td>
-                  <Td>{user.age}</Td>
-                  <Td>{shortGender(user.gender)}</Td>
-                  <Td><RolePill role={user.role} /></Td>
-                  <Td>
-                    <div className="flex space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-2 h-4 rounded ${i < user.cleanlinessLevel ? getColorForLevel(user.cleanlinessLevel) : "bg-gray-200"}`}
-                        />
-                      ))}
-                    </div>
-                  </Td>
-                  <Td>
-                    <div className="flex space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-2 h-4 rounded ${i < user.noiseTolerance ? getColorForLevel(user.noiseTolerance) : "bg-gray-200"}`}
-                        />
-                      ))}
-                    </div>
-                  </Td>
-                  <Td>{user.sleepTime}</Td>
-                  <Td>{user.compatibilityScore?.toFixed(1) || "–"}</Td>
-                  <Td>
-                    <div className="flex space-x-2">
-                      <ActionBtn onClick={() => handleLike(user.id)} color="green">
-                        Like
-                      </ActionBtn>
-                      <ActionBtn onClick={() => handlePass(user.id)} color="red">
-                        Pass
-                      </ActionBtn>
-                    </div>
-                  </Td>
-                </tr>
-              ))}
+              <AnimatePresence>
+                {filtered.map((user) => {
+                  if (flash?.id === user.id) {
+                    const bg = flash.type === "like" ? "bg-green-500" : "bg-red-500";
+                    return (
+                      <motion.tr
+                        key={user.id}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      >
+                        <td colSpan={9}>
+                          <div className={`${bg} text-white text-center py-4 rounded`}>
+                            <i>You {flash.type === "like" ? "liked" : "passed"} {flash.name}</i>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    );
+                  }
+                  return (
+                    <motion.tr
+                      key={user.id}
+                      initial={false}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="hover:bg-gray-50"
+                    >
+                      <Td>{user.name}</Td>
+                      <Td>{user.age}</Td>
+                      <Td>{shortGender(user.gender)}</Td>
+                      <Td><RolePill role={user.role} /></Td>
+                      <Td>
+                        <div className="flex space-x-1">
+                          {[...Array(5)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-2 h-4 rounded ${i < user.cleanlinessLevel ? getColorForLevel(user.cleanlinessLevel) : "bg-gray-200"}`}
+                            />
+                          ))}
+                        </div>
+                      </Td>
+                      <Td>
+                        <div className="flex space-x-1">
+                          {[...Array(5)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-2 h-4 rounded ${i < user.noiseTolerance ? getColorForLevel(user.noiseTolerance) : "bg-gray-200"}`}
+                            />
+                          ))}
+                        </div>
+                      </Td>
+                      <Td>{user.sleepTime}</Td>
+                      <Td>{user.compatibilityScore?.toFixed(1) || "–"}</Td>
+                      <Td>
+                        <div className="flex space-x-2">
+                          <ActionBtn onClick={() => handleLike(user.id)} color="green">
+                            Like
+                          </ActionBtn>
+                          <ActionBtn onClick={() => handlePass(user.id)} color="red">
+                            Pass
+                          </ActionBtn>
+                        </div>
+                      </Td>
+                    </motion.tr>
+                  );
+                })}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
       ) : (
         /* card view */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((user) => (
-            <MatchCard
-              key={user.id}
-              user={user}
-              onLike={() => handleLike(user.id)}
-              onPass={() => handlePass(user.id)}
-              showLocation={currentUser?.role === "looking"}
-            />
-          ))}
-        </div>
+        <AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((user) => {
+              if (flash?.id === user.id) {
+                const bg = flash.type === "like" ? "bg-green-500" : "bg-red-500";
+                return (
+                  <motion.div
+                    key={user.id}
+                    className={`${bg} text-white p-6 rounded-lg shadow-md text-center flex items-center justify-center min-h-[200px]`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <i>You {flash.type === "like" ? "liked" : "passed"} {flash.name}</i>
+                  </motion.div>
+                );
+              }
+              return (
+                <motion.div
+                  key={user.id}
+                  initial={false}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <MatchCard
+                    user={user}
+                    onLike={() => handleLike(user.id)}
+                    onPass={() => handlePass(user.id)}
+                    showLocation={currentUser?.role === "looking"}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+        </AnimatePresence>
       )}
     </div>
   );

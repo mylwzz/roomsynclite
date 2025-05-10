@@ -37,7 +37,6 @@ export default async function LandingPage() {
 
         <div className="mt-12 text-gray-500 text-sm text-center">
           <p>© {new Date().getFullYear()} RoomSync. All rights reserved.</p>
-          <p>A project for CS 5356 - Building Startup Systems</p>
         </div>
       </div>
     </div>
