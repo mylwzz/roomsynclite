@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { authClient, useSession } from "@/lib/auth-client";
 import { useState, useEffect, useRef } from "react";
@@ -37,6 +37,7 @@ interface SessionUser {
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session, isPending } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -66,6 +67,12 @@ export function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  const handleSignOut = async () => {
+    await authClient.signOut();    // clear the Better-Auth session cookie
+    router.push("/");              // navigate to landing
+    router.refresh();              // re-invoke all server hooks (including useSession)
+  };
 
   if (isPending) return <div className="h-16 bg-white shadow" />;
 
@@ -114,13 +121,7 @@ export function Navbar() {
                     )}
                     <div>
                       <button
-                        onClick={async () => {
-                          await fetch("/api/signout", {
-                            method: "POST",
-                            credentials: "include",
-                          });
-                          window.location.href = "/";
-                        }}
+                        onClick={handleSignOut}
                         className="w-full text-left px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100"
                       >
                         Sign&nbsp;Out
