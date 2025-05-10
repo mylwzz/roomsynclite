@@ -22,7 +22,6 @@ export default async function OnboardingPage() {
           <div className="bg-white rounded-2xl shadow-card p-8">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-3">
-                <span className="font-bold">1</span>
               </div>
               <h2 className="text-xl font-semibold">Create Your Profile</h2>
             </div>
